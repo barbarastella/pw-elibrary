@@ -13,6 +13,8 @@ import Generos from "./componentes/telas/Generos";
 import Usuarios from "./componentes/telas/Usuarios";
 import Reviews from "./componentes/telas/Reviews";
 
+// teste
+
 const router = createBrowserRouter([
     {
         path: "/",
