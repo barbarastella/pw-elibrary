@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { listarGeneros, criarGenero, atualizarGenero, removerGenero } from "../../servicos/GeneroServico";
+import { listarGeneros, criarGenero, atualizarGenero, removerGenero } from "../../servicos/GeneroServico.jsx";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";

@@ -5,13 +5,13 @@ import '@popperjs/core/dist/cjs/popper.js'
 import 'bootstrap/dist/js/bootstrap.min.js'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 
-import Menu from './componentes/Menu'
-import Home from './componentes/telas/Home'
-import Sobre from "./componentes/telas/Sobre";
-import Autores from "./componentes/telas/Autores";
-import Generos from "./componentes/telas/Generos";
-import Usuarios from "./componentes/telas/Usuarios";
-import Reviews from "./componentes/telas/Reviews";
+import Menu from './componentes/Menu.jsx'
+import Home from './componentes/telas/Home.jsx'
+import Sobre from "./componentes/telas/Sobre.jsx";
+import Autores from "./componentes/telas/Autores.jsx";
+import Generos from "./componentes/telas/Generos.jsx";
+import Usuarios from "./componentes/telas/Usuarios.jsx";
+import Reviews from "./componentes/telas/Reviews.jsx";
 
 const router = createBrowserRouter([
     {

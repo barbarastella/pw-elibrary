@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { listarAutores, criarAutor, atualizarAutor, removerAutor } from "../../servicos/AutorServico";
+import { listarAutores, criarAutor, atualizarAutor, removerAutor } from "../../servicos/AutorServico.jsx";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";

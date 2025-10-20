@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { listarUsuarios, criarUsuario, atualizarUsuario, removerUsuario } from "../../servicos/UsuarioServico";
-import { listarLeituras } from "../../servicos/LeituraServico";
+import { listarUsuarios, criarUsuario, atualizarUsuario, removerUsuario } from "../../servicos/UsuarioServico.jsx";
+import { listarLeituras } from "../../servicos/LeituraServico.jsx";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
