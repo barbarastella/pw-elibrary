@@ -2,10 +2,7 @@ import { useEffect, useState } from "react";
 import { listarLeituras, criarLeitura, atualizarLeitura, removerLeitura } from "../../servicos/LeituraServico.jsx";
 import { listarUsuarios } from "../../servicos/UsuarioServico.jsx";
 import { listarLivros } from "../../servicos/LivroServico.jsx";
-import Card from "react-bootstrap/Card";
-import Button from "react-bootstrap/Button";
-import Form from "react-bootstrap/Form";
-import Modal from "react-bootstrap/Modal";
+import { Card, Button, Form, Modal } from "react-bootstrap";
 
 function StarRating({ value }) {
     const stars = Array.from({ length: 5 }, (_, i) => i < (value || 0));

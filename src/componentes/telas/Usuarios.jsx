@@ -1,11 +1,8 @@
 import { useEffect, useState } from "react";
 import { listarUsuarios, criarUsuario, atualizarUsuario, removerUsuario } from "../../servicos/UsuarioServico.jsx";
 import { listarLeituras } from "../../servicos/LeituraServico.jsx";
-import Card from "react-bootstrap/Card";
-import Button from "react-bootstrap/Button";
-import Form from "react-bootstrap/Form";
-import Modal from "react-bootstrap/Modal";
-import Dialogo from "../comuns/Dialogo";
+import { Card, Button, Form, Modal } from "react-bootstrap";
+import Dialogo from "../comuns/Dialogo.jsx";
 
 function StarRating({ value }) {
     const stars = Array.from({ length: 5 }, (_, i) => i < (value || 0));

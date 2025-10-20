@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import { listarGeneros, criarGenero, atualizarGenero, removerGenero } from "../../servicos/GeneroServico.jsx";
-import Card from "react-bootstrap/Card";
-import Button from "react-bootstrap/Button";
-import Form from "react-bootstrap/Form";
-import Dialogo from "../comuns/Dialogo";
+import { Card, Button, Form } from "react-bootstrap";
+import Dialogo from "../comuns/Dialogo.jsx";
 
 function Generos() {
     const [generos, setGeneros] = useState([]);

@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import { listarAutores, criarAutor, atualizarAutor, removerAutor } from "../../servicos/AutorServico.jsx";
-import Card from "react-bootstrap/Card";
-import Button from "react-bootstrap/Button";
-import Form from "react-bootstrap/Form";
-import Dialogo from "../comuns/Dialogo";
+import { Card, Button, Form } from "react-bootstrap";
+import Dialogo from "../comuns/Dialogo.jsx";
 
 function Autores() {
     const [autores, setAutores] = useState([]);
