@@ -1,9 +1,6 @@
 
 import { useEffect, useState, useCallback } from 'react';
-import Card from 'react-bootstrap/Card';
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
-import Form from 'react-bootstrap/Form';
+import { Card, Button, Modal, Form } from 'react-bootstrap';
 import { listarLivros, criarLivro, atualizarLivro, removerLivro } from '../../servicos/LivroServico.jsx';
 import { listarAutores } from '../../servicos/AutorServico.jsx';
 import { listarGeneros } from '../../servicos/GeneroServico.jsx';
