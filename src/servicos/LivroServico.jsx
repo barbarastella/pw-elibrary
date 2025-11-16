@@ -1,3 +1,5 @@
+import { getToken } from '../seguranca/Auth';
+
 export const listarLivros = async () => {
     const response = await fetch(`${process.env.REACT_APP_ENDERECO_API}/books`,
         {
@@ -24,7 +26,7 @@ export const criarLivro = async (livro) => {
     const response = await fetch(`${process.env.REACT_APP_ENDERECO_API}/books`,
         {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json", "authorization": getToken() },
             body: JSON.stringify(livro)
         })
 
@@ -38,7 +40,7 @@ export const atualizarLivro = async (livro) => {
     const response = await fetch(`${process.env.REACT_APP_ENDERECO_API}/books`,
         {
             method: "PUT",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json", "authorization": getToken() },
             body: JSON.stringify(livro)
         })
 
@@ -52,7 +54,7 @@ export const removerLivro = async (id) => {
     const response = await fetch(`${process.env.REACT_APP_ENDERECO_API}/books/${id}`,
         {
             method: "DELETE",
-            headers: { "Content-Type": "application/json" }
+            headers: { "Content-Type": "application/json", "authorization": getToken() },
         })
 
     const data = await response.json()

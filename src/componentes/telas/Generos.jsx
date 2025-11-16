@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { listarGeneros, criarGenero, atualizarGenero, removerGenero } from "../../servicos/GeneroServico.jsx";
 import { Card, Button, Form } from "react-bootstrap";
 import Dialogo from "../comuns/Dialogo.jsx";
+import { getUsuario } from '../../seguranca/Auth.jsx';
 
 function Generos() {
+    const [usuario, setUsuario] = useState(getUsuario());
     const [generos, setGeneros] = useState([]);
     const [form, setForm] = useState({ id: null, name: "" });
     const [loading, setLoading] = useState(false);
@@ -78,7 +80,7 @@ function Generos() {
                     <p className="text-muted mb-0">Total de {generos.length} cadastros</p>
                 </div>
 
-                <Button className="btn-primary-custom" onClick={handleOpenModal}><i className="bi bi-tag-plus me-2"></i>Novo Gênero</Button>
+                {usuario && <Button className="btn-primary-custom" onClick={handleOpenModal}><i className="bi bi-tag-plus me-2"></i>Novo Gênero</Button>}
             </div>
 
             {erro && (
@@ -102,12 +104,12 @@ function Generos() {
                                 <Card.Title className="mb-2">{g.name}</Card.Title>
                                 <div className="text-muted mb-3"><small>ID: #{g.id}</small></div>
 
-                                <div className="mt-auto">
+                                {usuario?.user_type == 'admin' && <>  <div className="mt-auto">
                                     <div className="d-grid gap-2">
                                         <Button size="sm" className="btn-outline-primary-custom" onClick={() => handleEdit(g)}><i className="bi bi-pencil me-1"></i>Editar</Button>
                                         <Button size="sm" className="btn-outline-danger-custom" onClick={() => onDelete(g.id)}><i className="bi bi-trash me-1"></i>Remover</Button>
                                     </div>
-                                </div>
+                                </div></>}
                             </Card.Body>
                         </Card>
                     </div>

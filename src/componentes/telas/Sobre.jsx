@@ -14,9 +14,9 @@ const Sobre = () => (
                         <Table className="table-custom">
                             <thead>
                                 <tr>
-                                    <th>Tabela</th>
-                                    <th>Campos</th>
-                                    <th>Descrição</th>
+                                    <th><i className="bi bi-table me-2" />Tabela</th>
+                                    <th><i className="bi bi-list-columns me-2" />Campos</th>
+                                    <th><i className="bi bi-card-text me-2" />Descrição</th>
                                 </tr>
                             </thead>
                             <tbody>

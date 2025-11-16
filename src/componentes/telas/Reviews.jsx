@@ -3,8 +3,9 @@ import { listarLeituras, criarLeitura, atualizarLeitura, removerLeitura } from "
 import { listarUsuarios } from "../../servicos/UsuarioServico.jsx";
 import { listarLivros } from "../../servicos/LivroServico.jsx";
 import { Card, Button, Form, Modal } from "react-bootstrap";
+import { getUsuario } from '../../seguranca/Auth.jsx';
 
-function StarRating({ value }) {
+function EstrelasAvaliacao({ value }) {
     const stars = Array.from({ length: 5 }, (_, i) => i < (value || 0));
     return (
         <span>
@@ -15,7 +16,7 @@ function StarRating({ value }) {
     );
 }
 
-function StarRatingInput({ value, onChange }) {
+function EstrelasAvaliacaoEntrada({ value, onChange }) {
     return (
         <div className="d-flex align-items-center">
             <span className="me-2">Avaliação:</span>
@@ -33,6 +34,7 @@ function StarRatingInput({ value, onChange }) {
 }
 
 function Reviews() {
+    const [usuario, setUsuario] = useState(getUsuario());
     const [leituras, setLeituras] = useState([]);
     const [usuarios, setUsuarios] = useState([]);
     const [livros, setLivros] = useState([]);
@@ -51,14 +53,18 @@ function Reviews() {
     const carregar = async () => {
         setLoading(true);
         try {
-            const [leiturasData, usuariosData, livrosData] = await Promise.all([
-                listarLeituras(),
-                listarUsuarios(),
-                listarLivros()]);
+            const leiturasData = await listarLeituras();
+            await setLeituras(leiturasData.objeto);
 
-            if (leiturasData && leiturasData.objeto) await setLeituras(leiturasData.objeto);
-            if (usuariosData && usuariosData.objeto) await setUsuarios(usuariosData.objeto);
-            if (livrosData && livrosData.objeto) await setLivros(livrosData.objeto);
+            const livrosData = await listarLivros();
+            await setLivros(livrosData.objeto);
+
+            if (usuario) {
+                const usuariosData = await listarUsuarios();
+                await setUsuarios(usuariosData.objeto);
+            }
+
+            return;
 
         } catch (error) {
             setLeituras([]);
@@ -142,7 +148,7 @@ function Reviews() {
     const handleOpenModal = () => {
         setForm({
             id: null,
-            user_id: "",
+            user_id: usuario?.id || "",
             book_id: "",
             rating: 5,
             review: "",
@@ -161,7 +167,7 @@ function Reviews() {
                     <p className="text-muted mb-0">Total de {leituras.length} avaliações registradas</p>
                 </div>
 
-                <Button className="btn-primary-custom" onClick={handleOpenModal}><i className="bi bi-plus-circle me-2" /> Nova review</Button>
+                {usuario && <Button className="btn-primary-custom" onClick={handleOpenModal}><i className="bi bi-plus-circle me-2" /> Nova review</Button>}
             </div>
 
             {loading && (
@@ -192,7 +198,7 @@ function Reviews() {
 
                                     <div className="d-flex justify-content-between align-items-start mb-1">
                                         <div className="flex-grow-1"><h5 className="card-title mb-1">{leitura.book.title} <span className="text-muted">({leitura.book.publication_year})</span></h5></div>
-                                        <div className="text-end"><StarRating value={leitura.rating} /></div>
+                                        <div className="text-end"><EstrelasAvaliacao value={leitura.rating} /></div>
                                     </div>
 
                                     <hr />
@@ -215,12 +221,12 @@ function Reviews() {
                                         </div>
                                     )}
 
-                                    <div className="mt-auto">
+                                    {((usuario?.user_type == 'admin') || (usuario?.id == leitura.user.id)) && <><div className="mt-auto">
                                         <div className="d-grid gap-2">
                                             <Button size="sm" className="btn-outline-primary-custom" onClick={() => handleEdit(leitura)}><i className="bi bi-pencil me-1" />Editar review </Button>
                                             <Button size="sm" className="btn-outline-danger-custom" onClick={() => handleDelete(leitura.id)}><i className="bi bi-trash me-1" />Remover</Button>
                                         </div>
-                                    </div>
+                                    </div></>}
                                 </Card.Body>
                             </Card>
                         </div>
@@ -228,7 +234,7 @@ function Reviews() {
                 </div>
             )}
 
-            <Modal show={showModal} onHide={handleCloseModal} size="lg">
+            {usuario && <Modal show={showModal} onHide={handleCloseModal} size="lg">
                 <Modal.Header>
                     <Modal.Title><i className="bi bi-star me-2" /> {form.id ? "Editar Review" : "Nova Review"}</Modal.Title>
                 </Modal.Header>
@@ -245,12 +251,14 @@ function Reviews() {
                                         onChange={(e) => setForm({ ...form, user_id: e.target.value })}
                                         required>
 
-                                        <option disabled selected value="">Selecione um usuário...</option>
-                                        {usuarios.map(user => (
-                                            <option key={user.id} value={user.id}>
-                                                {user.name} (@{user.username})
-                                            </option>
-                                        ))}
+                                        <option disabled value="">Selecione um usuário...</option>
+                                        {usuario?.user_type == 'admin' ? (
+                                            usuarios.map(user => (
+                                                <option key={user.id} value={user.id}>{user.name} (@{user.username})</option>
+                                            ))
+                                        ) : (
+                                            <option value={usuario?.id}>{usuario?.name} (@{usuario?.username})</option>
+                                        )}
                                     </Form.Select>
                                 </Form.Group>
                             </div>
@@ -292,7 +300,7 @@ function Reviews() {
                                 <Form.Label className="form-label-custom"><i className="bi bi-star me-2" />Avaliação</Form.Label>
 
                                 <div className="bg-light p-3 rounded">
-                                    <StarRatingInput value={form.rating} onChange={(rating) => setForm({ ...form, rating })} />
+                                    <EstrelasAvaliacaoEntrada value={form.rating} onChange={(rating) => setForm({ ...form, rating })} />
                                 </div>
                             </div>
 
@@ -317,7 +325,7 @@ function Reviews() {
                         <Button className="btn-primary-custom" type="submit" disabled={loading}><i className="bi bi-check-circle me-2" />{form.id ? "Atualizar" : "Adicionar"} review</Button>
                     </Modal.Footer>
                 </Form>
-            </Modal>
+            </Modal>}
         </div>
     );
 }

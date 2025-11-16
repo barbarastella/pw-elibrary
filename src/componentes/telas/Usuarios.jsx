@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import { listarUsuarios, criarUsuario, atualizarUsuario, removerUsuario } from "../../servicos/UsuarioServico.jsx";
+import { listarUsuarios, criarUsuario, atualizarUsuario, removerUsuario, obterUsuario } from "../../servicos/UsuarioServico.jsx";
 import { listarLeituras } from "../../servicos/LeituraServico.jsx";
 import { Card, Button, Form, Modal } from "react-bootstrap";
 import Dialogo from "../comuns/Dialogo.jsx";
+import FormularioUsuario from "../comuns/FormularioUsuario.jsx";
+import { getUsuario } from '../../seguranca/Auth.jsx';
 
-function StarRating({ value }) {
+function EstrelasAvaliacao({ value }) {
     const stars = Array.from({ length: 5 }, (_, i) => i < (value || 0));
     return (
         <span>
@@ -16,9 +18,10 @@ function StarRating({ value }) {
 }
 
 function Usuarios() {
+    const [usuario, setUsuario] = useState(getUsuario());
     const [usuarios, setUsuarios] = useState([]);
     const [leituras, setLeituras] = useState([]);
-    const [form, setForm] = useState({ id: null, name: "", username: "", email: "", password: "" });
+    const [form, setForm] = useState({ id: null, name: "", username: "", email: "", password: "", user_type: "" });
     const [showModal, setShowModal] = useState(false);
     const [showModalLeituras, setShowModalLeituras] = useState(false);
     const [usuarioSelecionado, setUsuarioSelecionado] = useState(null);
@@ -38,7 +41,24 @@ function Usuarios() {
         }
     };
 
-    useEffect(() => { carregar(); }, []);
+    const carregarUsuarioAtual = async () => {
+        try {
+            const usuarioToken = getUsuario();
+            if (usuarioToken && usuarioToken.id) {
+                if (usuarioToken.user_type == null) {
+                    const resposta = await obterUsuario(usuarioToken.id);
+                    if (resposta && resposta.objeto) setUsuario(resposta.objeto);
+                }
+            }
+        } catch (error) {
+            console.error("Erro ao carregar usuário atual: " + error.message);
+        }
+    };
+
+    useEffect(() => {
+        carregar();
+        carregarUsuarioAtual();
+    }, []);
 
     const onSubmit = async (e) => {
         e.preventDefault();
@@ -81,7 +101,7 @@ function Usuarios() {
                     <p className="text-muted mb-0">Total de {usuarios.length} cadastros</p>
                 </div>
 
-                <Button className="btn-primary-custom" onClick={handleOpenModal}><i className="bi bi-person-plus me-2"></i>Novo usuário</Button>
+                {usuario?.user_type == 'admin' && <Button className="btn-primary-custom" onClick={handleOpenModal}><i className="bi bi-person-plus me-2"></i>Novo usuário</Button>}
             </div>
 
             <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4 mb-4">
@@ -93,18 +113,26 @@ function Usuarios() {
                                     <div className="bg-gradient-primary rounded-circle d-inline-flex align-items-center justify-content-center text-white" style={{ width: '80px', height: '80px' }}><i className="bi bi-person-fill display-4"></i></div>
                                 </div>
 
+                                <span><i className="bi bi-person-fill text-secondary fs-1"></i></span>
                                 <Card.Title className="mb-2">{u.name}</Card.Title>
-
                                 <div className="text-muted mb-1"><i className="bi bi-at me-1" />{u.username}</div>
-                                <div className="text-muted mb-3"><i className="bi bi-envelope me-1" />{u.email} </div>
-                                <div className="text-muted mb-3"><small>ID: #{u.id}</small></div>
+                                {((usuario?.user_type == 'admin') || (usuario?.id == u.id)) && (
+                                    <>
+                                        <div className="text-muted mb-3"><i className="bi bi-envelope me-1" />{u.email}</div>
+                                        <div className="text-muted mb-3"><small>ID: #{u.id}</small></div>
+                                    </>
+                                )}
 
                                 <div className="mt-auto">
-                                    <div className="d-grid gap-2">
-                                        <Button size="sm" className="btn-outline-primary-custom" onClick={() => handleEdit(u)}> <i className="bi bi-pencil me-1"></i>Editar </Button>
-                                        <Button size="sm" className="btn-outline-secondary-custom" onClick={() => handleOpenModalLeituras(u)}>   <i className="bi bi-book me-1"></i>Leituras ({userLeituras(u.id).length})  </Button>
-                                        <Button size="sm" className="btn-outline-danger-custom" onClick={async () => { await removerUsuario(u.id); await carregar(); }}>    <i className="bi bi-trash me-1"></i>Remover  </Button>
-                                    </div>
+                                    {((usuario?.user_type == 'admin') || (usuario?.id == u.id)) && (
+                                        <div className="d-grid gap-2">
+                                            <Button size="sm" className="btn-outline-secondary-custom" onClick={() => handleOpenModalLeituras(u)}><b>Suas leituras</b> ({userLeituras(u.id).length})</Button>
+                                            <div className="d-flex gap-2">
+                                                <Button size="sm" className="btn-success flex-grow-1" onClick={() => handleEdit(u)}><i className="bi bi-pencil me-1"></i>Editar</Button>
+                                                <Button size="sm" className="btn-danger flex-grow-1" onClick={async () => { await removerUsuario(u.id); await carregar(); }}><i className="bi bi-trash me-1"></i>Remover</Button>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </Card.Body>
                         </Card>
@@ -123,65 +151,11 @@ function Usuarios() {
                 loading={loading}
                 size="lg">
 
-                <div className="text-center mb-4">
-                    <div className="bg-gradient-primary rounded-circle d-inline-flex align-items-center justify-content-center text-white" style={{ width: '100px', height: '100px' }}><i className="bi bi-person-fill display-3" /></div>
-                </div>
-
-                <div className="row g-3">
-                    <div className="col-md-6">
-                        <Form.Group>
-                            <Form.Label className="form-label-custom"><i className="bi bi-person me-2"></i>Nome Completo</Form.Label>
-
-                            <Form.Control className="form-control-custom"
-                                type="text"
-                                value={form.name}
-                                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                                placeholder="Digite o nome completo"
-                                required />
-                        </Form.Group>
-                    </div>
-
-                    <div className="col-md-6">
-                        <Form.Group>
-                            <Form.Label className="form-label-custom"><i className="bi bi-at me-2"></i>Username</Form.Label>
-
-                            <Form.Control className="form-control-custom"
-                                type="text"
-                                value={form.username}
-                                onChange={(e) => setForm({ ...form, username: e.target.value })}
-                                placeholder="Digite o username"
-                                required />
-                        </Form.Group>
-                    </div>
-
-                    <div className="col-md-6">
-                        <Form.Group>
-                            <Form.Label className="form-label-custom"><i className="bi bi-envelope me-2"></i>E-mail</Form.Label>
-
-                            <Form.Control className="form-control-custom"
-                                type="email"
-                                value={form.email}
-                                onChange={(e) => setForm({ ...form, email: e.target.value })}
-                                placeholder="Digite o email"
-                                required />
-                        </Form.Group>
-                    </div>
-
-                    <div className="col-md-6">
-                        <Form.Group>
-                            <Form.Label className="form-label-custom"><i className="bi bi-lock me-2"></i>Senha</Form.Label>
-
-                            <Form.Control className="form-control-custom"
-                                type="password"
-                                value={form.password}
-                                onChange={(e) => setForm({ ...form, password: e.target.value })}
-                                placeholder={form.id ? "Digite nova senha (opcional)" : "Digite a senha"}
-                                required={!form.id} />
-
-                            {form.id && <Form.Text className="text-muted">Deixe em branco para manter a senha atual</Form.Text>}
-                        </Form.Group>
-                    </div>
-                </div>
+                <FormularioUsuario
+                    form={form}
+                    setForm={setForm}
+                    modo="completo"
+                />
             </Dialogo>
 
             <Modal show={showModalLeituras} onHide={handleCloseModalLeituras} size="xl">
@@ -220,7 +194,7 @@ function Usuarios() {
                                                 <Card.Body>
                                                     <div className="d-flex justify-content-between align-items-start mb-3">
                                                         <h6 className="mb-1 text-truncate" title={l.book.title}><i className="bi bi-book me-1 text-primary" />{l.book.title} </h6>
-                                                        <StarRating value={l.rating} />
+                                                        <EstrelasAvaliacao value={l.rating} />
                                                     </div>
 
                                                     <div className="mb-2">

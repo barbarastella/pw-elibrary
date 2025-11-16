@@ -47,7 +47,7 @@ function Dialogo(props) {
                 </Modal.Body>
 
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={onHide} disabled={loading}> <i className="bi bi-x-circle me-2"></i>{textoBotaoCancelar}</Button>
+                    <Button variant="secondary" onClick={onHide}> <i className="bi bi-x-circle me-2"></i>{textoBotaoCancelar}</Button>
                     <Button variant="success" type="submit" disabled={loading}> <i className="bi bi-save me-2"></i>{textoBotaoSalvar}</Button>
                 </Modal.Footer>
             </Form>

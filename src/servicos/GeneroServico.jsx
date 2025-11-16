@@ -1,8 +1,10 @@
+import { getToken } from '../seguranca/Auth';
+
 export const listarGeneros = async () => {
     const response = await fetch(`${process.env.REACT_APP_ENDERECO_API}/genres`,
         {
             method: "GET",
-            headers: { "Content-Type": "application/json" }
+            headers: { "Content-Type": "application/json", "authorization": getToken() },
         })
 
     const data = await response.json()
@@ -13,7 +15,7 @@ export const obterGenero = async (id) => {
     const response = await fetch(`${process.env.REACT_APP_ENDERECO_API}/genres/${id}`,
         {
             method: "GET",
-            headers: { "Content-Type": "application/json" }
+            headers: { "Content-Type": "application/json", "authorization": getToken() },
         })
 
     const data = await response.json()
@@ -24,7 +26,7 @@ export const criarGenero = async (genero) => {
     const response = await fetch(`${process.env.REACT_APP_ENDERECO_API}/genres`,
         {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json", "authorization": getToken() },
             body: JSON.stringify(genero)
         })
 
@@ -38,9 +40,7 @@ export const atualizarGenero = async (genero) => {
     const response = await fetch(`${process.env.REACT_APP_ENDERECO_API}/genres`,
         {
             method: "PUT",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json", "authorization": getToken() },
             body: JSON.stringify(genero)
         })
 
@@ -54,9 +54,7 @@ export const removerGenero = async (id) => {
     const response = await fetch(`${process.env.REACT_APP_ENDERECO_API}/genres/${id}`,
         {
             method: "DELETE",
-            headers: {
-                "Content-Type": "application/json"
-            }
+            headers: { "Content-Type": "application/json", "authorization": getToken() },
         })
 
     const data = await response.json();

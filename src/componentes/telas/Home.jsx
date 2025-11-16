@@ -1,11 +1,21 @@
 
 import { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, Button, Modal, Form } from 'react-bootstrap';
 import { listarLivros, criarLivro, atualizarLivro, removerLivro } from '../../servicos/LivroServico.jsx';
 import { listarAutores } from '../../servicos/AutorServico.jsx';
 import { listarGeneros } from '../../servicos/GeneroServico.jsx';
+import { getUsuario } from '../../seguranca/Auth.jsx';
 
 function Home() {
+
+    const navigate = useNavigate();
+    const [usuario, setUsuario] = useState(getUsuario());
+
+    useEffect(() => {
+        if (usuario) navigate('/admin');
+    }, []);
+
     const [livros, setLivros] = useState([]);
     const [autores, setAutores] = useState([]);
     const [generos, setGeneros] = useState([]);
@@ -20,11 +30,15 @@ function Home() {
             const resLivros = await listarLivros();
             await setLivros(resLivros.objeto);
 
-            const resAutores = await listarAutores();
-            await setAutores(resAutores.objeto);
+            if (usuario) {
+                const resAutores = await listarAutores();
+                await setAutores(resAutores.objeto);
 
-            const resGeneros = await listarGeneros();
-            await setGeneros(resGeneros.objeto);
+                const resGeneros = await listarGeneros();
+                await setGeneros(resGeneros.objeto);
+            }
+
+            return;
         } catch (error) {
             setLivros([]);
             setAutores([]);
@@ -75,7 +89,7 @@ function Home() {
 
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <div><h2 className="mb-0"><i className="bi bi-collection me-2 icon-book"></i> Livros cadastrados</h2></div>
-                <Button className="btn-primary-custom" onClick={abrirNovo}> <i className="bi bi-plus-circle me-2"></i>Novo Livro</Button>
+                {usuario && <Button className="btn-primary-custom" onClick={abrirNovo}> <i className="bi bi-plus-circle me-2"></i>Novo Livro</Button>}
             </div>
 
             {erro && (
@@ -104,19 +118,19 @@ function Home() {
                                     <strong>Gênero:</strong> {generoNome(livro)}
                                 </div>
 
-                                <div className="mt-auto">
+                                {usuario?.user_type == 'admin' && <><div className="mt-auto">
                                     <div className="d-grid gap-2">
                                         <Button size="sm" className="btn-outline-primary-custom" onClick={() => abrirEditar(livro)}><i className="bi bi-pencil me-1"></i>Editar</Button>
                                         <Button size="sm" className="btn-outline-danger-custom" onClick={() => excluir(livro.id)}><i className="bi bi-trash me-1"></i>Remover</Button>
                                     </div>
-                                </div>
+                                </div></>}
                             </Card.Body>
                         </Card>
                     </div>
                 ))}
             </div>
 
-            <Modal show={show} onHide={fechar} backdrop="static" size="lg">
+            {usuario && <Modal show={show} onHide={fechar} backdrop="static" size="lg">
                 <Form onSubmit={salvar}>
                     <Modal.Header>
                         <Modal.Title><i className="bi bi-book me-2"></i> {form.id ? 'Editar livro' : 'Adicionar livro'}</Modal.Title>
@@ -190,7 +204,7 @@ function Home() {
                         <Button className="btn-primary-custom" type="submit"> <i className="bi bi-check-circle me-2" />{form.id ? 'Atualizar' : 'Adicionar'} Livro</Button>
                     </Modal.Footer>
                 </Form>
-            </Modal>
+            </Modal>}
         </div>
     );
 }

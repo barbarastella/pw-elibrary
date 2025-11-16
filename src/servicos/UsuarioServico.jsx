@@ -1,8 +1,10 @@
+import { getToken } from '../seguranca/Auth';
+
 export const listarUsuarios = async () => {
     const response = await fetch(`${process.env.REACT_APP_ENDERECO_API}/users`,
         {
             method: "GET",
-            headers: { "Content-Type": "application/json" }
+            headers: { "Content-Type": "application/json", "authorization": getToken() },
         })
 
     const data = await response.json()
@@ -13,7 +15,7 @@ export const obterUsuario = async (id) => {
     const response = await fetch(`${process.env.REACT_APP_ENDERECO_API}/users/${id}`,
         {
             method: "GET",
-            headers: { "Content-Type": "application/json" }
+            headers: { "Content-Type": "application/json", "authorization": getToken() },
         })
 
     const data = await response.json()
@@ -24,7 +26,7 @@ export const criarUsuario = async (usuario) => {
     const response = await fetch(`${process.env.REACT_APP_ENDERECO_API}/users`,
         {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json", "authorization": getToken() },
             body: JSON.stringify(usuario)
         })
 
@@ -38,7 +40,7 @@ export const atualizarUsuario = async (usuario) => {
     const response = await fetch(`${process.env.REACT_APP_ENDERECO_API}/users`,
         {
             method: "PUT",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json", "authorization": getToken() },
             body: JSON.stringify(usuario)
         })
 
@@ -52,7 +54,7 @@ export const removerUsuario = async (id) => {
     const response = await fetch(`${process.env.REACT_APP_ENDERECO_API}/users/${id}`,
         {
             method: "DELETE",
-            headers: { "Content-Type": "application/json" }
+            headers: { "Content-Type": "application/json", "authorization": getToken() },
         })
 
     const data = await response.json();

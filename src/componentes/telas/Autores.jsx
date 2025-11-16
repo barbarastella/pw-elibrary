@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import { listarAutores, criarAutor, atualizarAutor, removerAutor } from "../../servicos/AutorServico.jsx";
+import { Navigate } from "react-router-dom";
 import { Card, Button, Form } from "react-bootstrap";
 import Dialogo from "../comuns/Dialogo.jsx";
+import { getUsuario } from '../../seguranca/Auth.jsx';
 
 function Autores() {
+    const [usuario, setUsuario] = useState(getUsuario());
     const [autores, setAutores] = useState([]);
     const [form, setForm] = useState({ id: null, name: "" });
     const [loading, setLoading] = useState(false);
@@ -70,6 +73,8 @@ function Autores() {
         }
     };
 
+    if (!usuario) { return <Navigate to="/login" replace />; }
+
     return (
         <div className="container mt-4">
 
@@ -79,7 +84,7 @@ function Autores() {
                     <p className="text-muted mb-0">Total de {autores.length} cadastros</p>
                 </div>
 
-                <Button className="btn-primary-custom" onClick={handleOpenModal}><i className="bi bi-person-plus me-2"></i>Novo Autor </Button>
+                {usuario && <Button className="btn-primary-custom" onClick={handleOpenModal}><i className="bi bi-person-plus me-2"></i>Novo Autor </Button>}
             </div>
 
             {erro && (
@@ -101,12 +106,12 @@ function Autores() {
                                 <Card.Title className="mb-2">{a.name}</Card.Title>
                                 <div className="text-muted mb-3"><small>ID: #{a.id}</small></div>
 
-                                <div className="mt-auto">
+                                {usuario?.user_type == 'admin' && <> <div className="mt-auto">
                                     <div className="d-grid gap-2">
                                         <Button size="sm" className="btn-outline-primary-custom" onClick={() => onEdit(a)}> <i className="bi bi-pencil me-1"></i>Editar</Button>
                                         <Button size="sm" className="btn-outline-danger-custom" onClick={() => onDelete(a.id)}> <i className="bi bi-trash me-1"></i>Remover</Button>
                                     </div>
-                                </div>
+                                </div></>}
                             </Card.Body>
                         </Card>
                     </div>
